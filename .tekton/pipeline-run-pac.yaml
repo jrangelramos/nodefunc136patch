@@ -1,0 +1,60 @@
+
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  labels:
+    "app.kubernetes.io/instance": "nodefunc136patch"
+    "app.openshift.io/runtime": "nodejs"
+    "function.knative.dev/name": "nodefunc136patch"
+    "function.knative.dev/runtime": "node"
+    
+    tekton.dev/pipeline: nodefunc136patch-pack-git-pipeline
+  annotations:
+    # The event we are targeting as seen from the webhook payload
+    # this can be an array too, i.e: [pull_request, push]
+    pipelinesascode.tekton.dev/on-event: "[push]"
+
+    # The branch or tag we are targeting (ie: main, refs/tags/*)
+    pipelinesascode.tekton.dev/on-target-branch: "[main]"
+
+    # Fetch the git-clone task from hub
+    pipelinesascode.tekton.dev/task: git-clone
+
+    # How many runs we want to keep attached to this event
+    pipelinesascode.tekton.dev/max-keep-runs: "5"
+
+    # User defined Annotations
+    
+  generateName: nodefunc136patch-pack-git-pipeline-run
+spec:
+  params:
+    - name: gitRepository
+      value: "{{ repo_url }}"
+    - name: gitRevision
+      value: "{{ revision }}"
+    - name: contextDir
+      value: ""
+    - name: imageName
+      value: image-registry.openshift-image-registry.svc:5000/oncluster/nodefunc136patch:latest
+    - name: registry
+      value: image-registry.openshift-image-registry.svc:5000/oncluster
+    - name: builderImage
+      value: ghcr.io/knative/builder-jammy-base:latest
+    - name: buildEnvs
+      value:
+        - =
+        
+  pipelineRef:
+   name: nodefunc136patch-pack-git-pipeline
+  workspaces:
+    - name: source-workspace
+      persistentVolumeClaim:
+        claimName: nodefunc136patch-pack-git-pipeline-pvc
+      subPath: source
+    - name: cache-workspace
+      persistentVolumeClaim:
+        claimName: nodefunc136patch-pack-git-pipeline-pvc
+      subPath: cache
+    - name: dockerconfig-workspace
+      secret:
+        secretName: nodefunc136patch-pack-git-pipeline-secret
