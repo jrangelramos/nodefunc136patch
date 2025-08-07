@@ -5,6 +5,9 @@ metadata:
   labels:
     "app.kubernetes.io/instance": "nodefunc136patch"
     "app.openshift.io/runtime": "nodejs"
+    "boson.dev/function": "true"
+    "boson.dev/runtime": "node"
+    "function.knative.dev": "true"
     "function.knative.dev/name": "nodefunc136patch"
     "function.knative.dev/runtime": "node"
     
@@ -43,8 +46,6 @@ spec:
           value: $(params.gitRepository)
         - name: revision
           value: $(params.gitRevision)
-        - name: gitInitImage
-          value: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/git-init:v0.21.0
       taskRef:
         kind: Task
         name: git-clone
@@ -66,11 +67,10 @@ spec:
             description: Path to the function project
             name: path
         steps:
-          - command:
-              - scaffold
-              - $(params.path)
-            image: ghcr.io/knative/func-utils:v2
+          - image: ghcr.io/knative/func-utils:latest
             name: func-scaffold
+            script: |
+              scaffold $(params.path)
         workspaces:
           - description: The workspace containing the function project
             name: source
@@ -141,7 +141,7 @@ spec:
           - args:
               - --env-vars
               - $(params.ENV_VARS[*])
-            image: docker.io/library/bash:5.1
+            image: docker.io/library/bash:5.1.4@sha256:b208215a4655538be652b2769d82e576bc4d0a2bb132144c060efc5be8c3f5d6
             name: prepare
             script: |
               #!/usr/bin/env bash
@@ -238,7 +238,7 @@ spec:
                 name: layers-dir
               - mountPath: /platform
                 name: $(params.PLATFORM_DIR)
-          - image: docker.io/library/bash:5.1
+          - image: docker.io/library/bash:5.1.4@sha256:b208215a4655538be652b2769d82e576bc4d0a2bb132144c060efc5be8c3f5d6
             name: results
             script: |
               #!/usr/bin/env bash
@@ -318,12 +318,10 @@ spec:
             description: Container image to be deployed
             name: image
         steps:
-          - command:
-              - deploy
-              - $(params.path)
-              - $(params.image)
-            image: ghcr.io/knative/func-utils:v2
+          - image: ghcr.io/knative/func-utils:latest
             name: func-deploy
+            script: |
+              deploy $(params.path) "$(params.image)"
         workspaces:
           - description: The workspace containing the function project
             name: source

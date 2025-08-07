@@ -5,6 +5,9 @@ metadata:
   labels:
     "app.kubernetes.io/instance": "nodefunc136patch"
     "app.openshift.io/runtime": "nodejs"
+    "boson.dev/function": "true"
+    "boson.dev/runtime": "node"
+    "function.knative.dev": "true"
     "function.knative.dev/name": "nodefunc136patch"
     "function.knative.dev/runtime": "node"
     
