@@ -3,12 +3,8 @@
 specVersion: 0.36.0
 name: nodefunc136patch
 runtime: node
-registry: image-registry.openshift-image-registry.svc:5000/oncluster
 created: 2025-08-07T14:22:12.177888618-03:00
 build:
   git:
     url: https://github.com/jrangelramos/nodefunc136patch
     revision: main
-  builder: pack
-deploy:
-  image: image-registry.openshift-image-registry.svc:5000/oncluster/nodefunc136patch:latest
